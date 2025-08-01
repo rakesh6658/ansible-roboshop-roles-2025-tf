@@ -1,0 +1,45 @@
+- name: Install Maven
+  ansible.builtin.yum:
+    name: maven
+    state: present
+- name: setting app directory
+  import_role:
+    name: common
+    tasks_from: setup-app.yaml    
+- name: Build shipping.jar using Maven
+  ansible.builtin.shell: mvn clean package
+  args:
+    chdir: /app
+  register: maven_result
+
+- name: Rename shipping-1.0.jar to shipping.jar
+  ansible.builtin.shell: mv target/shipping-1.0.jar shipping.jar
+  args:
+    chdir: /app
+- name: setting systemd from common tasks
+  import_role:
+    name: common
+    tasks_from: setup-systemd.yaml        
+- name: Install MySQL client
+  ansible.builtin.yum:
+    name: mysql
+    state: present
+
+- name: Load DB schema
+  ansible.builtin.shell: mysql -h mysql.joindevops.store -uroot -pRoboShop@1 < /app/db/schema.sql
+
+- name: Create app user
+  ansible.builtin.shell: mysql -h mysql.joindevops.store -uroot -pRoboShop@1 < /app/db/app-user.sql
+
+- name: Load master data
+  ansible.builtin.shell: mysql -h mysql.joindevops.store -uroot -pRoboShop@1 < /app/db/master-data.sql
+
+
+
+- name: Restart shipping
+  ansible.builtin.service:
+    name: shipping
+    state: restarted
+    
+
+

@@ -1,0 +1,28 @@
+- name: disable current module
+  ansible.builtin.command: dnf module disable redis -y
+
+- name: enable current module
+  ansible.builtin.command: dnf module enable redis -y
+
+- name: installing redis
+  ansible.builtin.yum:
+    name: redis
+    state: present
+
+- name: Replace localhost to public
+  ansible.builtin.replace:
+    path: /etc/redis/redis.conf
+    regexp: '127.0.0.1'
+    replace: '0.0.0.0'
+
+- name: Disable Redis protected-mode in redis.conf
+  ansible.builtin.replace:
+    path: /etc/redis/redis.conf
+    regexp: '^protected-mode\s+yes'
+    replace: 'protected-mode no'
+
+- name: starting and enabling catalogue
+  ansible.builtin.systemd_service:
+    name: redis
+    state: started
+    enabled: true

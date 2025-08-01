@@ -1,0 +1,16 @@
+- name: installing nodejs from common tasks
+  import_role:
+    name: common
+    tasks_from: setup-nodejs.yaml
+- name: setting app directory
+  import_role:
+    name: common
+    tasks_from: setup-app.yaml 
+- name: Change the working directory to app and install dependencies
+  ansible.builtin.shell: npm install
+  args:
+    chdir: /app    
+- name: setting systemd from common tasks
+  import_role:
+    name: common
+    tasks_from: setup-systemd.yaml    

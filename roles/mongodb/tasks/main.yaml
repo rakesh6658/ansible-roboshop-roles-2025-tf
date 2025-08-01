@@ -1,0 +1,33 @@
+- name: Copying mongo.repo
+  ansible.builtin.copy:
+    src: mongo.repo
+    dest: /etc/yum.repos.d/mongo.repo
+- name: Copying catalogue.js
+  ansible.builtin.copy:
+    src: catalogue.js
+    dest: /tmp/catalogue.js  
+
+- name: Installing MongoDB
+  ansible.builtin.yum:
+    name: mongodb-org
+    state: present
+
+- name: Replace localhost to public
+  ansible.builtin.replace:
+    path: /etc/mongod.conf
+    regexp: '127.0.0.1'
+    replace: '0.0.0.0'
+
+- name: Enabling MongoDB without starting
+  ansible.builtin.systemd_service:
+    name: mongod
+    enabled: true
+    state: stopped
+
+- name: Starting MongoDB after config update
+  ansible.builtin.systemd_service:
+    name: mongod
+    state: started
+- name: loading schema
+  ansible.builtin.shell: mongosh --host localhost < /tmp/catalogue.js
+

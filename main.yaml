@@ -1,0 +1,5 @@
+- name: creating roles
+  hosts: localhost
+  become: yes
+  roles:
+    - "{{component}}"
