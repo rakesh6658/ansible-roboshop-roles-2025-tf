@@ -14,14 +14,6 @@
   import_role:
     name: common
     tasks_from: setup-systemd.yaml    
-- name: copying mongo.repo
-  ansible.builtin.copy:
-    src: mongo.repo
-    dest: /etc/yum.repos.d/mongo.repo
 
-- name: install mongod-client
-  ansible.builtin.yum:
-    name: mongodb-mongosh
-    state: present
 
 
